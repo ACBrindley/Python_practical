@@ -6,10 +6,6 @@ Adrian Brindley - GEOG5991M Assignment 1
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-* {
-    box-sizing: border-box;
-}
-
 body {
 	font-family: 'Open Sans', sans-serif;
 	background-color: #bfd5ff;
@@ -28,9 +24,20 @@ article {
 	style= font-family: 'Open Sans', sans-serif;
 	margin: auto;
     padding: 20px;
-    width: 60%;
+    width: 80%;
     background-color: white;
 }
+
+.btn {
+    margin: none;
+    padding:none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn:hover {
+  background-color: RoyalBlue;
+} 
 
 /* Clear floats after the columns */
 section:after {
@@ -59,13 +66,14 @@ footer {
 </head>
 
 <header>
-    <h1>Hello World</h1>
+    <h1>Adrian Brindley</h1>
 </header>
 
 <section>
 
   <article>
-    <h1>Welcome to Adrian Brindley's GitHub Page</h1>
+    <h2>Welcome to My GitHub Page</h2>
+	<h2>My Bio:</h2>
     <h1>Education:</h1>
 	<p>1 x Geographic Information Systems (Distance Learning) MSc (In Progress), University of Leeds<br>
 	1 x Geography BSc - 2.1 Honours, Loughborough University<br>
@@ -79,11 +87,125 @@ footer {
 	United Kingdom: 1996 - 2015<br>
 	Sultanate of Oman: 2015 - 2018 <br>
 	United Kingdom: 2018 - present</p>
-  </article>
+	<p> Languages spoken: English (fluent), German (level 3), Arabic (level 1)</p>
+	<p> Travel: Substantial travel in several regions, predominantly within North America, Europe and Asia. Whilst travelling I have engulfed myself in the different cultures, eaten the local food, attended local weddings and stayed in people's homes. I have travelled by aeroplane, boat, car, moped, bicycle and on my own two feet.<br>
+	My travel experiences has opened my mind to other cultures, helped develop my social skills and most of all given me the confidence to do anything I put my mind to.
+	<h1>Work Experience: </h1>
+	<p>Research Finance Administrator, SSEHS, Loughborough University: July 2012 - November 2013<br>
+	Quantity Surveyor, Kier Group PLC: June 2007 - September 2007<br>
+	Geospatial Analyst, Civil Service: November 2013 - September 2015<br>
+	Geographic Information Systems Specialist, National Survey Authority, Oman: September 2015 - July 2018<br>
+	GIS Section Manager, Civil Service: July 2018 - Present
+		<h2>Current Projects: </h2>
+	<p>Assignment 1: Python ABM Project - downloadable<button class="btn"><i class="fa fa-download"></i><a href="zip_project.zip">here</a></button> <br>
+	Assignment 2: Black Death Jupyter Notebook</p>
+	<h1>Assignment 1:</h1>
+	<p>Open the .txt file, create the plot size and axes and write the .txt file into environment:</p>
+	<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>
+f = open("in.txt")
+fig = matplotlib.pyplot.figure(figsize=(7, 7))
+ax = fig.add_axes([0, 0, 1, 1])
+environment = []
+for line in f:
+    parsed_line = str.split(line,",")
+    rowlist = []
+    for word in parsed_line:
+        rowlist.append(float(word))
+    environment.append(rowlist)
+#print(environment)
+f.close()</pre>
+<p>Next, create agents, iterations and neighbourhood variables. Fill the agents array by calling the agentframework class and appending the data:</p> 
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>
+num_of_agents = 100
+num_of_iterations = 10
+neighbourhood = 20
+agents = []
+carry_on = True
+object1 = agentframework.Agent(environment, agents)
+
+def update(frame_number):
+    fig.clear()
+    global carry_on
+    
+    for i in range(num_of_agents):
+        agents.append(agentframework.Agent(environment, agents))
+</pre>
+<p> Let's get the agents moving, eating and sharing... This code runs through the agents, calling each to move, eat and share with neighbours. These are methods called from the agentframework class, which will be discussed later:</p>
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>
+    for j in range(num_of_iterations):
+        for i in range(num_of_agents):
+            shuffle(agents)
+            agents[i].move()
+            agents[i].eat()
+            agents[i].share_with_neighbours(neighbourhood)</pre>
+<p>Now, ensure, when it is called, that if agents eat more than 90 then they will not carry on:</p>
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace> 
+    if object1.agent_eats > 90:
+        carry_on = False
+        print("stopping condition")</pre>
+<p>Plot the agents onto the environment image:</p>
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>
+    matplotlib.pyplot.xlim(0, 99)
+    matplotlib.pyplot.ylim(0, 99)
+    matplotlib.pyplot.imshow(environment)
+    for i in range(num_of_agents):
+        matplotlib.pyplot.scatter(agents[i].x,agents[i].y)</pre>
+<p>Generate a function to ensure that the agents stop moving when criteria are met:</p>
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>
+def gen_function(b = [0]):
+    a = 0
+    global carry_on 
+    while (a < 1000) & (carry_on) :
+        yield a			
+        a = a + 1</pre>
+<p>Animate the agents on the environment plot and ensure they stop moving when criteria are matched:</p>
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>
+animation = matplotlib.animation.FuncAnimation(fig, update, interval=1, frames=gen_function, repeat=False)
+matplotlib.pyplot.show()</pre>
+<p>agentframework Class:<br>This class documents all of the methods to be called into the model.<br> The __init__ method ensures all the data is created and can be shared into the other methods:</p>
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>
+   def __init__(self, environment, agents):
+       self.x = random.randint(0,99)
+       self.y = random.randint(0,99)  
+       self.environment = environment
+       self.agents = agents
+       self.store = 0</pre>
+<p>Produce the move method. This is produced using the random method to move the x and y of the agents by one, depending on whether the random number produced is more than or less than 0.5:
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>
+   def move(self):
+       if random.random() < 0.5:
+            self.y = (self.y + 1) % 100
+       else:
+            self.y = (self.y - 1) % 100
+
+       if random.random() < 0.5:
+            self.x = (self.x + 1) % 100
+       else:
+            self.x = (self.x - 1) % 100
+</pre>
+<p> Produce the eat method. This shows the agents interacting with the environment when they move onto new pixels and 'eating' the pixel. It also shows the agent stores some of the environment to be shared with their neighbours later:</p>
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>   
+   def eat(self): 
+       if  self.environment[self.y][self.x] > 10:
+           self.environment[self.y][self.x] -= 100
+           self.store += 10</pre>
+<p>Calculate the distance between agents to identify agents who are close enough to share with neighbours later:</p>
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>
+   def distance_between(self, agent):
+       return (((self.x - agent.x)**2) + ((self.y - agent.y)**2))**0.5 </pre>
+<p>Enable the agents to be able to share with each other provided they are close enough together:</p>
+<pre style=font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace>
+   def share_with_neighbours(self, neighborhood):
+       for agent in self.agents:
+           distance = self.distance_between(agent) 
+           if distance <= neighborhood:
+               self.store = (self.store + agent.store)/2
+               agent.store = self.store
+               Agent.agent_eats = self.store</pre>
 </section>
 
 <footer>
-  <p>Footer</p>
+  <p>Student: 201075965 - Adrian Brindley - GEOG5991M</p>
 </footer>
 
 </body>
